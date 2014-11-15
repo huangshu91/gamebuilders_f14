@@ -1,46 +1,11 @@
 import pygame
 import sys
 import os
+from constants import *
+from Player import *
+from Enemy import *
+from GameMap import *
 from menu import *
-
-
-class Player(pygame.sprite.Sprite):
-    # constructor for this class
-    def __init__(self):
-        # call the parent class (Sprite) constructor
-        pygame.sprite.Sprite.__init__(self)
-        # create 50px by 50px surface
-        self.image = pygame.Surface((50, 50))
-        # color the surface cyan
-        self.image.fill((0, 205, 205))
-        self.rect = self.image.get_rect()
-        self.speed = [0, 0]
-
-    def left(self):
-        self.speed[0] -= 8
-
-    def right(self):
-        self.speed[0] += 8
-
-    def up(self):
-        self.speed[1] -= 8
-
-    def down(self):
-        self.speed[1] += 8
-
-    def move(self):
-        # move the rect by the displacement ("speed")
-        self.rect = self.rect.move(self.speed)
-
-
-class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        # load the PNG
-        self.image = pygame.image.load(os.path.join('images', 'ball.png'))
-        self.rect = self.image.get_rect()
-        self.rect.topleft = 0, 0
-
 
 def event_loop():
     # get the pygame screen and create some local vars
@@ -54,12 +19,19 @@ def event_loop():
     clock = pygame.time.Clock()
     # initialize the score counter
     score = 0
+    deltat = 0
     # initialize the enemy speed
     enemy_speed = [6, 6]
+
+    # initialize the game map
+    level = GameMap()
     
     # initialize the player and the enemy
-    player = Player()
-    enemy = Enemy()
+    player = Player(level)
+    enemy = Enemy(level)
+    enemy_list = []
+
+    enemy_list.append(enemy)
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
@@ -68,8 +40,8 @@ def event_loop():
     sprite_list.add(enemy)
 
     # create a sprite group for enemies only to detect collisions
-    enemy_list = pygame.sprite.Group()
-    enemy_list.add(enemy)
+    #enemy_list = pygame.sprite.Group()
+    #enemy_list.add(enemy)
 
     # main game loop
     while 1:
@@ -97,8 +69,11 @@ def event_loop():
                     player.down()
                 elif event.key == pygame.K_DOWN:
                     player.up()
-        
+
+        level.update(deltat)
+
         # call the move function for the player
+        player.update(deltat)
         player.move()
 
         # check player bounds
@@ -112,32 +87,36 @@ def event_loop():
             player.rect.bottom = screen_height
 
         # reverse the movement direction if enemy goes out of bounds
-        if enemy.rect.left < 0 or enemy.rect.right > screen_width:
-            enemy_speed[0] = -enemy_speed[0]
-        if enemy.rect.top < 0 or enemy.rect.bottom > screen_height:
-            enemy_speed[1] = -enemy_speed[1]
+        #if enemy.rect.left < 0 or enemy.rect.right > screen_width:
+        #    enemy_speed[0] = -enemy_speed[0]
+        #if enemy.rect.top < 0 or enemy.rect.bottom > screen_height:
+        #    enemy_speed[1] = -enemy_speed[1]
 
         # another way to move rects
-        enemy.rect.x += enemy_speed[0]
-        enemy.rect.y += enemy_speed[1]
+        #enemy.rect.x += enemy_speed[0]
+        #enemy.rect.y += enemy_speed[1]
 
         # detect all collisions between the player and enemy
         # but don't remove enemy after collisions
         # increment score if there was a collision
-        if pygame.sprite.spritecollide(player, enemy_list, False):
-            score += 1
+        #if pygame.sprite.spritecollide(player, enemy_list, False):
+        #    score += 1
 
         # black background
-        screen.fill((0, 0, 0))
+        #screen.fill((0, 0, 0))
+        level.render()
+
+        for en in enemy_list:
+            en.update()
 
         # set up the score text
-        text = basicFont.render('Score: %d' % score, True, (255, 255, 255))
-        textRect = text.get_rect()
-        textRect.centerx = screen_rect.centerx
-        textRect.centery = screen_rect.centery
+        #text = basicFont.render('Score: %d' % score, True, (255, 255, 255))
+        #textRect = text.get_rect()
+        #textRect.centerx = screen_rect.centerx
+        #textRect.centery = screen_rect.centery
         
         # draw the text onto the surface
-        screen.blit(text, textRect)
+        #screen.blit(text, textRect)
 
         # draw the player and enemy sprites to the screen
         sprite_list.draw(screen)
@@ -145,15 +124,17 @@ def event_loop():
         # update the screen
         pygame.display.flip()
 
-        # limit to 45 FPS
-        clock.tick(45)
+        # limit to 60 FPS
+        deltat = clock.tick(60)
 
 def main():
     # initialize pygame
     pygame.init()
 
+    global SCREEN_HEIGHT
+    global SCREEN_WIDTH
     # create the window
-    size = width, height = 360, 480
+    size = width, height = SCREEN_WIDTH, SCREEN_HEIGHT
     screen = pygame.display.set_mode(size)
 
     # set the window title
