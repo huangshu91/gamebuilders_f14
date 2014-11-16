@@ -31,6 +31,7 @@ class GameEngine:
         self.restart = False
         self.level = GameMap(self, self.gen)
         self.next_items = []
+        self.cur_items = []
 
         # main game loop
         while 1:
@@ -61,7 +62,10 @@ class GameEngine:
         self.gen += 1
         self.restart = False
         self.level = GameMap(self, self.gen)
-        self.level.handle_nextgen(self.next_items)
+        self.cur_items += self.next_items
+        self.next_items = []
+        self.level.handle_nextgen(self.cur_items)
+
 
     def run(self):
         # initialize pygame

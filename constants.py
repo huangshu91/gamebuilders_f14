@@ -16,6 +16,9 @@ INIT_ITEM_RATE = 3.0
 
 LEVEL_LENGTH = 120.0
 
+SPAWN_CLOUD = 4.0
+SPAWN_FEATURES = 2.5
+
 
 NUM_ITEMS = 3
 ITEMS = ['coins', 'skull', 'sword', 'health']

@@ -9,12 +9,11 @@ from Player import *
 from Enemy import *
 from Item import *
 from hud import *
+from Feature import *
 
 def get_dist_pe(player, enemy):
     p_loc = player.get_pos()
     e_loc = enemy.get_pos()
-    #print e_loc
-   # print p_loc
     return math.sqrt(math.pow(p_loc[0] - e_loc[0], 2) + math.pow(p_loc[1] - e_loc[1], 2))
 
 class GameMap:
@@ -22,10 +21,12 @@ class GameMap:
         global MAP_WIDTH
         global MAP_HEIGHT
         global CELL_SIZE
+        global INIT_SPAWN_RATE
 
         self.size = width, height = MAP_WIDTH, MAP_HEIGHT
         self.parent = parent
         self.gameover = False
+        self.gen = gen
 
         self.bgcolor = (135, 206, 250)
         self.mapcolor = (154, 205, 50)
@@ -39,6 +40,8 @@ class GameMap:
         self.item_timer = 0
         self.timer = 0
         self.progress = 0.0
+        self.cloud_timer = 0
+        self.feature_timer = 0
 
         self.player = Player(self)
 
@@ -48,9 +51,16 @@ class GameMap:
         self.enemy_list = []
         self.dead_list = []
         self.item_list = []
+        self.feature_list = []
+
+
+        self.generate_feature("parallax_cloud_back")
+        self.generate_feature("parallax_cloud_back")
 
         self.generation = gen
-
+        self.spawnrate = INIT_SPAWN_RATE - gen/10.0
+        if self.spawnrate < 0.5:
+            self.spawnrate = 0.5
 
     def render(self):
         self.screen.fill(self.bgcolor)
@@ -64,14 +74,21 @@ class GameMap:
         for it in self.item_list:
             it.render_sprite()
 
+        for feat in self.feature_list:
+            feat.render_sprite()
+
         self.hud.render_sprite()
 
     def update(self, deltat):
         global INIT_SPAWN_RATE
         global INIT_ITEM_RATE
+        global SPAWN_CLOUD
+        global SPAWN_FEATURES
 
         self.timer += deltat/1000.0
         self.item_timer += deltat/1000.0
+        self.cloud_timer += deltat/1000.0
+        self.feature_timer += deltat/1000.0
         self.progress += deltat/1000.0
 
         if self.gameover == True:
@@ -99,6 +116,9 @@ class GameMap:
             if (it.dead == True):
                 self.item_list.remove(it)
 
+        for feat in self.feature_list:
+            feat.update(deltat)
+
         if (self.timer > INIT_SPAWN_RATE):
             self.timer = 0
             self.generate_enemies()
@@ -107,9 +127,25 @@ class GameMap:
             self.item_timer = 0
             self.generate_items()
 
-    # def remove_corpse(self):
-    #     for en in self.dead_list:
-    #         self.enemy_list.remove
+        if (self.cloud_timer > SPAWN_CLOUD):
+            self.cloud_timer = 0
+            self.generate_feature("parallax_cloud_back")
+
+        if (self.feature_timer > SPAWN_FEATURES):
+            self.feature_timer = 0
+            self.generate_feature("rock")
+
+    def generate_feature(self, type):
+        feature = Feature(self, type)
+        if (type == "rock"):
+            feature.move_pos(x = 960-30, y = 300)
+            initial_y = randint(0, 240)
+            feature.move_pos(y = initial_y)
+        if (type == "parallax_cloud_back"):
+            initial_y = randint(0, 50)
+            feature.move_pos(x = 960-30, y = 0)
+            feature.move_pos(y = initial_y)
+        self.feature_list.append(feature)
 
     def generate_items(self):
         global ITEMS

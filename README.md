@@ -1,28 +1,11 @@
-pygame-topdown-framework
-========================
+GAMEBUILDERS 2014 FALL HACKATHON
+THEME: YOLO  One Life Only
+shuang81
 
-Framework provided for the Fall 2014 Gamebuildathon
+background: each time you "die" your descendent carries on your quest.  Items you collect during your life are passed on to future generations.  
 
-The goal is to provide the Gamebuildathon participants a basis with which to start their games. This framework implements many simple game features and mechanics that they may or may not decide to use.
+NOTE: sometimes buggy if you spam inputs after death.  
 
-Features provided
------------------
-
- * Selection menu
- * Input-controlled movement
- * Automated movement
- * Object oriented organization - player and enemy classes (extends Sprite)
- * Function-based control flow
- * Use of images
- * Collision detection
- * Display text
- * Score
-
-Usage
------
-
-This framework has been verified to work on EWS machines. It has also been shown to work on Windows machines. You must be using Python 2.7 or older with pygame installed.
-
- * Open a terminal in this directory
- * Run `python`
- * Run the program with `python framework.py`
+controls: 
+	arrows: 	movement
+	z: 			attack

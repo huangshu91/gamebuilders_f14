@@ -42,6 +42,8 @@ class Player(pygame.sprite.Sprite):
         self.atk_anim.loop = False
         self.atk_anim.set_colorkey((0,0,0))
 
+        self.dust_sprite = pygame.image.load('images/dustball.png').convert_alpha()
+
         self.atk_range = 90
 
     def left(self):
@@ -78,6 +80,13 @@ class Player(pygame.sprite.Sprite):
         self.atk_anim.blit(self.screen, self.rect.topleft)
         if self.is_attacking:
             pygame.draw.circle(self.screen, (255, 0, 0), self.rect.center, 40, 1)
+
+        if self.speed[0] != 0 or self.speed[1] != 0:
+            loc = [0, 0]
+            loc[0] = self.rect.bottomleft[0]
+            loc[1] = self.rect.bottomleft[1] - 10
+
+            self.screen.blit(self.dust_sprite, loc)
 
     def get_pos(self):
         return self.rect.center
